@@ -70,9 +70,8 @@ const HomeScreen = ({ navigation }) => {
     <TouchableOpacity 
       style={styles.groupItem}
       onPress={() => {
-        // Navigate to group details or bills listing for this group
-        // This would be implemented in a real app
-        Alert.alert('Group Selected', `Group: ${item.name}`);
+        // Navigate to group details screen
+        navigation.navigate('GroupDetails', { groupId: item.id });
       }}
     >
       <View style={styles.groupIcon}>
@@ -165,7 +164,15 @@ const HomeScreen = ({ navigation }) => {
 
             {groups.length > 0 && (
               <View style={styles.sectionContainer}>
-                <Text style={styles.sectionTitle}>Your Groups</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Your Groups</Text>
+                  <TouchableOpacity 
+                    onPress={() => navigation.navigate('CreateGroup')}
+                    style={styles.viewAllButton}
+                  >
+                    <Text style={styles.viewAllText}>Create New</Text>
+                  </TouchableOpacity>
+                </View>
                 <FlatList
                   data={groups}
                   renderItem={renderGroupItem}
@@ -179,7 +186,15 @@ const HomeScreen = ({ navigation }) => {
 
             {recentBills.length > 0 && (
               <View style={styles.sectionContainer}>
-                <Text style={styles.sectionTitle}>Recent Bills</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Recent Bills</Text>
+                  <TouchableOpacity 
+                    onPress={() => navigation.navigate('Debt')}
+                    style={styles.viewAllButton}
+                  >
+                    <Text style={styles.viewAllText}>View All</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           </>
@@ -254,10 +269,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 20,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+  },
+  viewAllButton: {
+    padding: 5,
+  },
+  viewAllText: {
+    color: '#2B478B',
+    fontWeight: 'bold',
   },
   groupList: {
     paddingRight: 20,

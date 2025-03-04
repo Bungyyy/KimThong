@@ -14,6 +14,7 @@ import LoginScreen from './screens/LoginScreen.js';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import AddBillScreen from './screens/AddBillScreen';
+import AddBillFormScreen from './screens/AddBillFormScreen';
 import DebtRecordScreen from './screens/DebtRecordScreen';
 import MyQRScreen from './screens/MyQRScreen';
 import ReminderScreen from './screens/ReminderScreen';
@@ -21,6 +22,12 @@ import NotificationScreen from './screens/NotificationScreen';
 import CreateGroupScreen from './screens/CreateGroupScreen';
 import JoinGroupScreen from './screens/JoinGroupScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import GroupDetailsScreen from './screens/GroupDetailsScreen';
+import BillDetailsScreen from './screens/BillDetailsScreen';
+import RequestPaymentScreen from './screens/RequestPaymentScreen';
+import ConfirmPaymentScreen from './screens/ConfirmPaymentScreen';
+import EditBillScreen from './screens/EditBillScreen';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -120,6 +127,11 @@ export default function App() {
               <Stack.Screen 
                 name="AddBill" 
                 component={AddBillScreen} 
+                options={{ title: 'Select Group for Bill' }} 
+              />
+              <Stack.Screen 
+                name="AddBillForm" 
+                component={AddBillFormScreen} 
                 options={{ title: 'Add New Bill' }} 
               />
               <Stack.Screen 
@@ -141,6 +153,31 @@ export default function App() {
                 name="JoinGroup" 
                 component={JoinGroupScreen} 
                 options={{ title: 'Join Group' }} 
+              />
+              <Stack.Screen 
+                name="GroupDetails" 
+                component={GroupDetailsScreen} 
+                options={{ title: 'Group Details' }} 
+              />
+              <Stack.Screen 
+                name="BillDetails" 
+                component={BillDetailsScreen} 
+                options={{ title: 'Bill Details' }} 
+              />
+              <Stack.Screen 
+                name="RequestPayment" 
+                component={RequestPaymentScreen} 
+                options={{ title: 'Request Payment' }} 
+              />
+              <Stack.Screen 
+                name="ConfirmPayment" 
+                component={ConfirmPaymentScreen} 
+                options={{ title: 'Confirm Payment' }} 
+              />
+              <Stack.Screen 
+                name="EditBill" 
+                component={EditBillScreen} 
+                options={{ title: 'Edit Bill' }} 
               />
             </>
           )}

@@ -7,7 +7,9 @@ import {
     doc, 
     query, 
     where, 
-    arrayUnion 
+    arrayUnion,
+    arrayRemove,
+    deleteDoc
   } from 'firebase/firestore';
   import { db } from './firebaseConfig';
   import { generateGroupCode } from '../utils/codeGenerator';
@@ -118,6 +120,36 @@ import {
           ...groupDoc.data()
         } 
       };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+  // Delete a group
+  export const deleteGroup = async (groupId) => {
+    try {
+      // Get group details first
+      const groupDoc = await getDoc(doc(db, "groups", groupId));
+      
+      if (!groupDoc.exists()) {
+        return { success: false, error: "Group not found" };
+      }
+      
+      const groupData = groupDoc.data();
+      const members = groupData.members || [];
+      
+      // Remove group from all members' groups array
+      for (const memberId of members) {
+        const userRef = doc(db, "users", memberId);
+        await updateDoc(userRef, {
+          groups: arrayRemove(groupId)
+        });
+      }
+      
+      // Delete the group document
+      await deleteDoc(doc(db, "groups", groupId));
+      
+      return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
     }

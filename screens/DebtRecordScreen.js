@@ -60,7 +60,19 @@ const DebtRecordScreen = ({ navigation }) => {
             const paidAmount = bill.payments && bill.payments[userId] ? bill.payments[userId].amount : 0;
             const remainingDebt = debtAmount - paidAmount;
             
-            if (remainingDebt > 0) {
+            // Check payment status
+            const isPaid = bill.payments && 
+                          bill.payments[userId] && 
+                          bill.payments[`${userId}_${bill.paidBy}`] && 
+                          bill.payments[`${userId}_${bill.paidBy}`].status === 'confirmed';
+            
+            const isPending = bill.payments && 
+                            bill.payments[userId] && 
+                            paidAmount >= debtAmount && 
+                            (!bill.payments[`${userId}_${bill.paidBy}`] || 
+                             bill.payments[`${userId}_${bill.paidBy}`].status !== 'confirmed');
+            
+            if (remainingDebt > 0 || isPending) {
               myDebts.push({
                 id: bill.id,
                 amount: remainingDebt,
@@ -68,10 +80,13 @@ const DebtRecordScreen = ({ navigation }) => {
                 restaurant: bill.restaurant,
                 date: bill.createdAt,
                 dueDate: bill.dueDate,
-                billId: bill.id
+                billId: bill.id,
+                status: isPaid ? 'paid' : isPending ? 'pending' : 'unpaid'
               });
               
-              debtTotal += remainingDebt;
+              if (remainingDebt > 0 && !isPaid) {
+                debtTotal += remainingDebt;
+              }
             }
           }
           
@@ -83,7 +98,19 @@ const DebtRecordScreen = ({ navigation }) => {
                 const paidAmount = bill.payments && bill.payments[participantId] ? bill.payments[participantId].amount : 0;
                 const remainingCredit = creditAmount - paidAmount;
                 
-                if (remainingCredit > 0) {
+                // Check payment status
+                const isPaid = bill.payments && 
+                              bill.payments[participantId] && 
+                              bill.payments[`${participantId}_${userId}`] && 
+                              bill.payments[`${participantId}_${userId}`].status === 'confirmed';
+                
+                const isPending = bill.payments && 
+                                bill.payments[participantId] && 
+                                paidAmount >= creditAmount && 
+                                (!bill.payments[`${participantId}_${userId}`] || 
+                                 bill.payments[`${participantId}_${userId}`].status !== 'confirmed');
+                
+                if (remainingCredit > 0 || isPending) {
                   myCredits.push({
                     id: `${bill.id}_${participantId}`,
                     amount: remainingCredit,
@@ -91,10 +118,13 @@ const DebtRecordScreen = ({ navigation }) => {
                     restaurant: bill.restaurant,
                     date: bill.createdAt,
                     dueDate: bill.dueDate,
-                    billId: bill.id
+                    billId: bill.id,
+                    status: isPaid ? 'paid' : isPending ? 'pending' : 'unpaid'
                   });
                   
-                  creditTotal += remainingCredit;
+                  if (remainingCredit > 0 && !isPaid) {
+                    creditTotal += remainingCredit;
+                  }
                 }
               }
             });
@@ -135,13 +165,48 @@ const DebtRecordScreen = ({ navigation }) => {
     fetchData();
   };
 
+  const handleDebtItemPress = (item) => {
+    // Navigate to bill details screen
+    navigation.navigate('BillDetails', { billId: item.billId });
+  };
+
+  const handleCreditItemPress = (item) => {
+    // Navigate to bill details screen
+    navigation.navigate('BillDetails', { billId: item.billId });
+  };
+
+  const getStatusIcon = (status) => {
+    switch(status) {
+      case 'paid':
+        return <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />;
+      case 'pending':
+        return <Ionicons name="time" size={24} color="#FF9800" />;
+      case 'unpaid':
+      default:
+        return <Ionicons name="alert-circle" size={24} color="#FF5722" />;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch(status) {
+      case 'paid':
+        return "Paid";
+      case 'pending':
+        return "Pending";
+      case 'unpaid':
+      default:
+        return "Unpaid";
+    }
+  };
+
   const renderDebtItem = ({ item }) => (
     <TouchableOpacity 
-      style={styles.debtItem}
-      onPress={() => {
-        // Navigate to bill details would be implemented in a real app
-        Alert.alert("Debt Details", `You owe ${userMap[item.to]?.name || 'Unknown'} ${item.amount} THB for ${item.restaurant}`);
-      }}
+      style={[styles.debtItem, 
+        item.status === 'paid' ? styles.paidItem : 
+        item.status === 'pending' ? styles.pendingItem : 
+        null
+      ]}
+      onPress={() => handleDebtItemPress(item)}
     >
       <View style={styles.debtItemHeader}>
         <Text style={styles.debtItemTitle}>{item.restaurant}</Text>
@@ -154,16 +219,29 @@ const DebtRecordScreen = ({ navigation }) => {
           To: {userMap[item.to]?.name || 'Unknown'}
         </Text>
       </View>
+      
+      <View style={styles.statusContainer}>
+        {getStatusIcon(item.status)}
+        <Text style={[
+          styles.statusText,
+          item.status === 'paid' ? styles.paidText : 
+          item.status === 'pending' ? styles.pendingText : 
+          styles.unpaidText
+        ]}>
+          {getStatusLabel(item.status)}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 
   const renderCreditItem = ({ item }) => (
     <TouchableOpacity 
-      style={styles.creditItem}
-      onPress={() => {
-        // Navigate to bill details would be implemented in a real app
-        Alert.alert("Credit Details", `${userMap[item.from]?.name || 'Unknown'} owes you ${item.amount} THB for ${item.restaurant}`);
-      }}
+      style={[styles.creditItem, 
+        item.status === 'paid' ? styles.paidItem : 
+        item.status === 'pending' ? styles.pendingItem : 
+        null
+      ]}
+      onPress={() => handleCreditItemPress(item)}
     >
       <View style={styles.debtItemHeader}>
         <Text style={styles.debtItemTitle}>{item.restaurant}</Text>
@@ -174,6 +252,19 @@ const DebtRecordScreen = ({ navigation }) => {
         <Text style={styles.debtItemDate}>Due: {formatDate(item.dueDate)}</Text>
         <Text style={styles.debtItemPerson}>
           From: {userMap[item.from]?.name || 'Unknown'}
+        </Text>
+      </View>
+      
+      <View style={styles.statusContainer}>
+        {getStatusIcon(item.status)}
+        <Text style={[
+          styles.statusText,
+          item.status === 'paid' ? styles.paidText : 
+          item.status === 'pending' ? styles.pendingText : 
+          styles.unpaidText
+        ]}>
+          {getStatusLabel(item.status)}
+          {item.status === 'pending' && ' - Tap to confirm'}
         </Text>
       </View>
     </TouchableOpacity>
@@ -254,23 +345,23 @@ const DebtRecordScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#F5F0E8',
-      paddingTop: 20, // Add this line
-    },
-    summaryContainer: {
-      flexDirection: 'row',
-      backgroundColor: '#fff',
-      margin: 20,
-      marginTop: 40, // Increase this value from 20 to 40
-      borderRadius: 12,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 3,
-      elevation: 3,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F0E8',
+    paddingTop: 20,
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    margin: 20,
+    marginTop: 40,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
   summaryBox: {
     flex: 1,
     padding: 15,
@@ -348,6 +439,16 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
+  paidItem: {
+    backgroundColor: '#E8F5E9',
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+  },
+  pendingItem: {
+    backgroundColor: '#FFF3E0',
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF9800',
+  },
   debtItemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -370,6 +471,7 @@ const styles = StyleSheet.create({
   debtItemDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 10,
   },
   debtItemDate: {
     fontSize: 14,
@@ -378,6 +480,28 @@ const styles = StyleSheet.create({
   debtItemPerson: {
     fontSize: 14,
     color: '#555',
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingTop: 5,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
+  },
+  statusText: {
+    marginLeft: 5,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  paidText: {
+    color: '#4CAF50',
+  },
+  pendingText: {
+    color: '#FF9800',
+  },
+  unpaidText: {
+    color: '#FF5722',
   },
   emptyState: {
     alignItems: 'center',
