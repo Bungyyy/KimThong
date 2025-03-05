@@ -32,13 +32,11 @@ const PaymentConfirmationScreen = ({ route, navigation }) => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // Get bill details
       const billDoc = await getDoc(doc(db, "bills", billId));
       if (billDoc.exists()) {
         setBillDetails(billDoc.data());
       }
 
-      // Get user details
       const fromUserDoc = await getDoc(doc(db, "users", fromUserId));
       if (fromUserDoc.exists()) {
         setFromUser(fromUserDoc.data());
@@ -49,7 +47,6 @@ const PaymentConfirmationScreen = ({ route, navigation }) => {
         setToUser(toUserDoc.data());
       }
 
-      // Check if current user is the debtor or creditor
       const currentUserId = auth.currentUser.uid;
       setCurrentUserIsDebtor(currentUserId === fromUserId);
       setCurrentUserIsCreditor(currentUserId === toUserId);

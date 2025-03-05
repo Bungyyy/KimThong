@@ -29,8 +29,6 @@ const DebtRecordScreen = ({ navigation }) => {
     setIsLoading(true);
     try {
       const userId = auth.currentUser.uid;
-      
-      // Get all users for name mapping
       const usersSnapshot = await getDocs(collection(db, "users"));
       const usersData = {};
       
@@ -43,8 +41,7 @@ const DebtRecordScreen = ({ navigation }) => {
       });
       
       setUserMap(usersData);
-      
-      // Get bills where user is a participant
+
       const billsResult = await getUserBills(userId);
       
       if (billsResult.success) {
@@ -54,13 +51,12 @@ const DebtRecordScreen = ({ navigation }) => {
         let creditTotal = 0;
         
         billsResult.bills.forEach(bill => {
-          // You owe someone
+
           if (bill.paidBy !== userId && bill.participants.includes(userId)) {
             const debtAmount = bill.splitAmounts[userId] || 0;
             const paidAmount = bill.payments && bill.payments[userId] ? bill.payments[userId].amount : 0;
             const remainingDebt = debtAmount - paidAmount;
-            
-            // Check payment status
+
             const isPaid = bill.payments && 
                           bill.payments[userId] && 
                           bill.payments[`${userId}_${bill.paidBy}`] && 
@@ -90,15 +86,12 @@ const DebtRecordScreen = ({ navigation }) => {
             }
           }
           
-          // Someone owes you
           if (bill.paidBy === userId) {
             bill.participants.forEach(participantId => {
               if (participantId !== userId) {
                 const creditAmount = bill.splitAmounts[participantId] || 0;
                 const paidAmount = bill.payments && bill.payments[participantId] ? bill.payments[participantId].amount : 0;
                 const remainingCredit = creditAmount - paidAmount;
-                
-                // Check payment status
                 const isPaid = bill.payments && 
                               bill.payments[participantId] && 
                               bill.payments[`${participantId}_${userId}`] && 
@@ -131,7 +124,6 @@ const DebtRecordScreen = ({ navigation }) => {
           }
         });
         
-        // Sort by date, newest first
         myDebts.sort((a, b) => new Date(b.date.seconds * 1000) - new Date(a.date.seconds * 1000));
         myCredits.sort((a, b) => new Date(b.date.seconds * 1000) - new Date(a.date.seconds * 1000));
         
@@ -151,8 +143,6 @@ const DebtRecordScreen = ({ navigation }) => {
 
   useEffect(() => {
     fetchData();
-    
-    // Refresh when screen comes into focus
     const unsubscribe = navigation.addListener('focus', () => {
       fetchData();
     });
@@ -166,12 +156,10 @@ const DebtRecordScreen = ({ navigation }) => {
   };
 
   const handleDebtItemPress = (item) => {
-    // Navigate to bill details screen
     navigation.navigate('BillDetails', { billId: item.billId });
   };
 
   const handleCreditItemPress = (item) => {
-    // Navigate to bill details screen
     navigation.navigate('BillDetails', { billId: item.billId });
   };
 

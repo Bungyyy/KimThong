@@ -32,8 +32,7 @@ const AddBillFormScreen = ({ navigation, route }) => {
   const [participants, setParticipants] = useState([]);
   const [customAmounts, setCustomAmounts] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Menu items state
+
   const [menuItems, setMenuItems] = useState([]);
   const [currentMenuItem, setCurrentMenuItem] = useState({
     name: '',
@@ -45,25 +44,21 @@ const AddBillFormScreen = ({ navigation, route }) => {
   const [paidBy, setPaidBy] = useState(null);
   const [paidByModalVisible, setPaidByModalVisible] = useState(false);
 
-  // Refs for input fields
   const itemNameRef = useRef(null);
   const itemPriceRef = useRef(null);
   const restaurantNameRef = useRef(null);
   const totalAmountRef = useRef(null);
   const paidAmountRef = useRef(null);
 
-  // Initialize with group members
   useEffect(() => {
     fetchGroupMembers();
   }, []);
 
-  // Update total amount when menu items change
   useEffect(() => {
     if (menuItems.length > 0) {
       const total = menuItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
       setTotalAmount(total.toString());
-      
-      // Recalculate custom splits based on menu items
+
       if (participants.length > 0) {
         calculateMenuBasedSplits();
       }
@@ -89,7 +84,6 @@ const AddBillFormScreen = ({ navigation, route }) => {
       
       setParticipants(groupMembers);
       
-      // Set current user as the payer by default
       const currentUser = groupMembers.find(member => member.id === auth.currentUser.uid);
       if (currentUser) {
         setPaidBy(currentUser);
@@ -107,7 +101,6 @@ const AddBillFormScreen = ({ navigation, route }) => {
     }
   };
 
-  // Method to handle adding a menu item
   const handleAddMenuItem = () => {
     if (!currentMenuItem.name || !currentMenuItem.price) {
       Alert.alert("Error", "Please enter both item name and price");
@@ -119,40 +112,33 @@ const AddBillFormScreen = ({ navigation, route }) => {
       return;
     }
     
-    // Dismiss keyboard
     Keyboard.dismiss();
     
     if (itemIndex !== null) {
-      // Edit existing item
       const updatedItems = [...menuItems];
       updatedItems[itemIndex] = currentMenuItem;
       setMenuItems(updatedItems);
     } else {
-      // Add new item
       setMenuItems([...menuItems, currentMenuItem]);
     }
-    
-    // Reset the current menu item and close modal
+
     setCurrentMenuItem({ name: '', price: '', consumers: [] });
     setItemIndex(null);
     setMenuItemModalVisible(false);
   };
 
-  // Method to handle editing an existing menu item
   const handleEditMenuItem = (index) => {
     setCurrentMenuItem(menuItems[index]);
     setItemIndex(index);
     setMenuItemModalVisible(true);
   };
 
-  // Method to remove a menu item
   const handleRemoveMenuItem = (index) => {
     const updatedItems = [...menuItems];
     updatedItems.splice(index, 1);
     setMenuItems(updatedItems);
   };
 
-  // Method to toggle a user's consumption status for the current menu item
   const toggleConsumer = (userId) => {
     let updatedConsumers;
     
@@ -165,16 +151,13 @@ const AddBillFormScreen = ({ navigation, route }) => {
     setCurrentMenuItem({...currentMenuItem, consumers: updatedConsumers});
   };
 
-  // Calculate per-person split based on menu items
   const calculateMenuBasedSplits = () => {
     const newSplits = {};
-    
-    // Initialize all participants with 0
+
     participants.forEach(user => {
       newSplits[user.id] = 0;
     });
-    
-    // Calculate each person's share based on menu items
+
     menuItems.forEach(item => {
       const itemPrice = parseFloat(item.price) || 0;
       const consumerCount = item.consumers.length;
@@ -188,7 +171,6 @@ const AddBillFormScreen = ({ navigation, route }) => {
       }
     });
     
-    // Round to 2 decimal places
     Object.keys(newSplits).forEach(userId => {
       newSplits[userId] = Math.round(newSplits[userId] * 100) / 100;
     });
@@ -231,7 +213,6 @@ const AddBillFormScreen = ({ navigation, route }) => {
     setIsLoading(true);
     
     try {
-      // Use split amounts calculated from menu items
       const splitAmounts = customAmounts;
       
       const billData = {
@@ -307,7 +288,6 @@ const AddBillFormScreen = ({ navigation, route }) => {
     );
   };
 
-  // Dismiss keyboard when tapping outside input areas
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -327,7 +307,6 @@ const AddBillFormScreen = ({ navigation, route }) => {
               </Text>
             </View>
             
-            {/* Restaurant Name */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Restaurant Name</Text>
               <TextInput
@@ -340,8 +319,7 @@ const AddBillFormScreen = ({ navigation, route }) => {
                 onSubmitEditing={dismissKeyboard}
               />
             </View>
-            
-            {/* Menu Items Section */}
+
             <View style={styles.inputContainer}>
               <View style={styles.labelRow}>
                 <Text style={styles.inputLabel}>Menu Items</Text>
@@ -372,8 +350,7 @@ const AddBillFormScreen = ({ navigation, route }) => {
                 </View>
               )}
             </View>
-            
-            {/* Total Amount (calculated automatically from menu items) */}
+
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Total Amount (THB)</Text>
               <TextInput
@@ -642,7 +619,6 @@ const AddBillFormScreen = ({ navigation, route }) => {
   );
 };
 
-// Complete styles object with addItemButtonText and any other missing styles
 const styles = StyleSheet.create({
     container: {
       flex: 1,

@@ -1,19 +1,16 @@
-// Format date to display in the app
 export const formatDate = (date) => {
     if (!date) return '';
     
     if (typeof date === 'string') {
       date = new Date(date);
     } else if (date.toDate && typeof date.toDate === 'function') {
-      // Handle Firestore Timestamp
       date = date.toDate();
     }
     
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString(undefined, options);
   };
-  
-  // Get today's date in yyyy-mm-dd format for date inputs
+
   export const getTodayFormatted = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -22,8 +19,7 @@ export const formatDate = (date) => {
     
     return `${yyyy}-${mm}-${dd}`;
   };
-  
-  // Convert yyyy-mm-dd to Date object
+
   export const parseDate = (dateString) => {
     if (!dateString) return null;
     

@@ -35,17 +35,14 @@ const LoginScreen = ({ navigation }) => {
     try {
       let result;
 
-      // Check if input is email or username
       if (emailOrUsername.includes('@')) {
-        // Login with email
+
         result = await loginUser(emailOrUsername, password);
       } else {
-        // Login with username
         result = await loginWithUsername(emailOrUsername, password);
       }
       
       if (result.success) {
-        // Login successful, navigation will be handled by App.js through auth state change
       } else {
         Alert.alert('Login Failed', result.error);
       }
@@ -164,7 +161,6 @@ const LoginScreen = ({ navigation }) => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Forgot Password Modal */}
       <Modal
         animationType="slide"
         transparent={true}

@@ -32,16 +32,13 @@ const GroupDetailsScreen = ({ route, navigation }) => {
   const fetchGroupDetails = async () => {
     setIsLoading(true);
     try {
-      // Get group details
       const result = await getGroupDetails(groupId);
       
       if (result.success) {
         setGroupDetails(result.group);
         
-        // Check if current user is creator
         setIsCreator(result.group.creator === auth.currentUser.uid);
         
-        // Get group members
         const memberIds = result.group.members;
         const usersSnapshot = await getDocs(collection(db, "users"));
         const membersData = [];
@@ -60,7 +57,6 @@ const GroupDetailsScreen = ({ route, navigation }) => {
         
         setGroupMembers(membersData);
         
-        // Get group bills
         const billsResult = await getGroupBills(groupId);
         if (billsResult.success) {
           setGroupBills(billsResult.bills);
@@ -136,7 +132,6 @@ const GroupDetailsScreen = ({ route, navigation }) => {
     <TouchableOpacity
       style={styles.billItem}
       onPress={() => {
-        // Navigate to bill details (would be implemented in a real app)
         Alert.alert("Bill Details", `Restaurant: ${item.restaurant}, Total: ${item.totalAmount} THB`);
       }}
     >
@@ -213,7 +208,7 @@ const GroupDetailsScreen = ({ route, navigation }) => {
       </View>
       
       <FlatList
-        data={groupBills.slice(0, 3)} // Show only 3 most recent bills
+        data={groupBills.slice(0, 3)}
         renderItem={renderBillItem}
         keyExtractor={(item) => item.id}
         style={styles.billsList}
@@ -232,8 +227,7 @@ const GroupDetailsScreen = ({ route, navigation }) => {
           <Text style={styles.deleteButtonText}>Delete Group</Text>
         </TouchableOpacity>
       )}
-      
-      {/* Delete Confirmation Modal */}
+
       <Modal
         visible={deleteModalVisible}
         transparent={true}

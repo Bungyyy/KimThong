@@ -13,11 +13,8 @@ import {
   } from 'firebase/firestore';
   import { db } from './firebaseConfig';
   import { generateGroupCode } from '../utils/codeGenerator';
-  
-  // Create a new group
   export const createGroup = async (name, creatorId) => {
     try {
-      // Generate a unique 6-character code for the group
       const groupCode = generateGroupCode();
       
       const groupData = {
@@ -30,8 +27,6 @@ import {
       };
       
       const docRef = await addDoc(collection(db, "groups"), groupData);
-      
-      // Add group reference to user
       const userRef = doc(db, "users", creatorId);
       await updateDoc(userRef, {
         groups: arrayUnion(docRef.id)
@@ -43,10 +38,8 @@ import {
     }
   };
   
-  // Join a group with code
   export const joinGroupWithCode = async (groupCode, userId) => {
     try {
-      // Find group with the provided code
       const q = query(
         collection(db, "groups"),
         where("groupCode", "==", groupCode)
@@ -57,18 +50,13 @@ import {
       if (querySnapshot.empty) {
         return { success: false, error: "Invalid group code" };
       }
-      
-      // Get the first (and should be only) document
       const groupDoc = querySnapshot.docs[0];
       const groupId = groupDoc.id;
-      
-      // Add user to group members
       const groupRef = doc(db, "groups", groupId);
       await updateDoc(groupRef, {
         members: arrayUnion(userId)
       });
       
-      // Add group to user's groups
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
         groups: arrayUnion(groupId)
@@ -79,8 +67,7 @@ import {
       return { success: false, error: error.message };
     }
   };
-  
-  // Get user's groups
+
   export const getUserGroups = async (userId) => {
     try {
       const q = query(
@@ -103,8 +90,6 @@ import {
       return { success: false, error: error.message };
     }
   };
-  
-  // Get group details
   export const getGroupDetails = async (groupId) => {
     try {
       const groupDoc = await getDoc(doc(db, "groups", groupId));
@@ -125,10 +110,8 @@ import {
     }
   };
 
-  // Delete a group
   export const deleteGroup = async (groupId) => {
     try {
-      // Get group details first
       const groupDoc = await getDoc(doc(db, "groups", groupId));
       
       if (!groupDoc.exists()) {
@@ -137,16 +120,14 @@ import {
       
       const groupData = groupDoc.data();
       const members = groupData.members || [];
-      
-      // Remove group from all members' groups array
+
       for (const memberId of members) {
         const userRef = doc(db, "users", memberId);
         await updateDoc(userRef, {
           groups: arrayRemove(groupId)
         });
       }
-      
-      // Delete the group document
+
       await deleteDoc(doc(db, "groups", groupId));
       
       return { success: true };

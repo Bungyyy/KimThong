@@ -1,4 +1,3 @@
-// Generate a random 6-character alphanumeric code for group joining
 export const generateGroupCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';

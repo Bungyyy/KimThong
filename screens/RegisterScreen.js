@@ -32,11 +32,9 @@ const RegisterScreen = ({ navigation }) => {
     bankName: '',
     referenceNumber: ''
   });
-
-  // Auto-generate username from name
+  
   const handleNameChange = (text) => {
     setName(text);
-    // Generate username suggestion (lowercase, no spaces)
     if (!username) {
       setUsername(text.toLowerCase().replace(/\s+/g, ''));
     }
@@ -66,7 +64,6 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
 
-    // Basic username validation (alphanumeric and underscore only)
     if (!/^[a-zA-Z0-9_]+$/.test(username)) {
       Alert.alert('Error', 'Username can only contain letters, numbers, and underscores');
       return;
@@ -78,7 +75,6 @@ const RegisterScreen = ({ navigation }) => {
       
       if (result.success) {
         Alert.alert('Success', 'Account created successfully!');
-        // User will be redirected to the app via auth state change in App.js
       } else {
         Alert.alert('Registration Failed', result.error);
       }
@@ -204,7 +200,6 @@ const RegisterScreen = ({ navigation }) => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* QR Code Modal */}
       <Modal
         animationType="slide"
         transparent={true}

@@ -25,14 +25,11 @@ const ReminderScreen = ({ navigation }) => {
     setIsLoading(true);
     try {
       const userId = auth.currentUser.uid;
-      
-      // Get overdue bills
       const overdueResult = await getOverdueBills(userId);
       if (overdueResult.success) {
         setOverdueBills(overdueResult.bills);
       }
-      
-      // Get upcoming bills
+
       const upcomingResult = await getUpcomingBills(userId);
       if (upcomingResult.success) {
         setUpcomingBills(upcomingResult.bills);
@@ -59,7 +56,6 @@ const ReminderScreen = ({ navigation }) => {
     <TouchableOpacity 
       style={styles.billItem}
       onPress={() => {
-        // Navigate to bill details would be implemented in a real app
         Alert.alert("Bill Details", `You owe ${item.splitAmounts[auth.currentUser.uid]} THB for ${item.restaurant}`);
       }}
     >

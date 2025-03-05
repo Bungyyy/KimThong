@@ -36,8 +36,6 @@ const MyQRScreen = ({ navigation }) => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         setQrDetails(userData.qrPayment || null);
-        
-        // Pre-populate edit form if QR details exist
         if (userData.qrPayment) {
           setEditedDetails(userData.qrPayment);
         }
@@ -55,7 +53,6 @@ const MyQRScreen = ({ navigation }) => {
   }, []);
 
   const handleSaveQR = async () => {
-    // Validate fields
     if (!editedDetails.accountName || !editedDetails.accountNumber || !editedDetails.bankName) {
       Alert.alert("Error", "Please fill in all required fields");
       return;
@@ -148,7 +145,6 @@ const MyQRScreen = ({ navigation }) => {
         </ScrollView>
       )}
 
-      {/* Edit QR Details Modal */}
       <Modal
         animationType="slide"
         transparent={true}

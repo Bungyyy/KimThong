@@ -24,21 +24,17 @@ const HomeScreen = ({ navigation }) => {
     setIsLoading(true);
     try {
       const userId = auth.currentUser.uid;
-      
-      // Get user's groups
+
       const groupsResult = await getUserGroups(userId);
       if (groupsResult.success) {
         setGroups(groupsResult.groups);
       }
       
-      // Get user's recent bills
       const billsResult = await getUserBills(userId);
       if (billsResult.success) {
-        // Sort by date, newest first
         const sortedBills = billsResult.bills.sort((a, b) => 
           new Date(b.createdAt.seconds * 1000) - new Date(a.createdAt.seconds * 1000)
         );
-        // Get only the 5 most recent bills
         setRecentBills(sortedBills.slice(0, 5));
       }
     } catch (error) {
@@ -52,8 +48,6 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     fetchData();
-    
-    // Refresh data when screen comes into focus
     const unsubscribe = navigation.addListener('focus', () => {
       fetchData();
     });
@@ -70,7 +64,6 @@ const HomeScreen = ({ navigation }) => {
     <TouchableOpacity 
       style={styles.groupItem}
       onPress={() => {
-        // Navigate to group details screen
         navigation.navigate('GroupDetails', { groupId: item.id });
       }}
     >
@@ -90,8 +83,6 @@ const HomeScreen = ({ navigation }) => {
     <TouchableOpacity 
       style={styles.billItem}
       onPress={() => {
-        // Navigate to bill details
-        // This would be implemented in a real app
         Alert.alert('Bill Selected', `Restaurant: ${item.restaurant}`);
       }}
     >

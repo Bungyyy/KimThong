@@ -33,7 +33,6 @@ const BillDetailsScreen = ({ route, navigation }) => {
   const fetchBillDetails = async () => {
     setIsLoading(true);
     try {
-      // Get bill details
       const billDoc = await getDoc(doc(db, "bills", billId));
       if (!billDoc.exists()) {
         Alert.alert("Error", "Bill not found");
@@ -44,16 +43,13 @@ const BillDetailsScreen = ({ route, navigation }) => {
       const billData = billDoc.data();
       setBill(billData);
       
-      // Check if current user is bill owner
       const currentUserId = auth.currentUser.uid;
       setIsCurrentUserOwner(currentUserId === billData.paidBy);
-      
-      // Get menu items
+
       if (billData.menuItems) {
         setMenuItems(billData.menuItems);
       }
-      
-      // Get all users for name mapping
+
       const usersSnapshot = await getDocs(collection(db, "users"));
       const usersData = {};
       const participantsList = [];
@@ -76,8 +72,7 @@ const BillDetailsScreen = ({ route, navigation }) => {
             amount: billData.splitAmounts[doc.id] || 0
           });
         }
-        
-        // Set bill owner
+
         if (doc.id === billData.paidBy) {
           setBillOwner({
             id: doc.id,
@@ -90,18 +85,15 @@ const BillDetailsScreen = ({ route, navigation }) => {
       
       setUserMap(usersData);
       setParticipants(participantsList);
-      
-      // Process payment status - using the same currentUserId from above
+
       const paymentsList = [];
-      
-      // For each participant
+
       billData.participants.forEach(participantId => {
-        if (participantId !== billData.paidBy) { // Skip the bill owner
+        if (participantId !== billData.paidBy) {
           const amount = billData.splitAmounts[participantId] || 0;
           const paidAmount = billData.payments && billData.payments[participantId] ? 
                            billData.payments[participantId].amount : 0;
-          
-          // Check confirmation status
+
           const isConfirmed = billData.payments && 
                             billData.payments[participantId] &&
                             billData.payments[participantId].status === 'confirmed';
@@ -110,7 +102,6 @@ const BillDetailsScreen = ({ route, navigation }) => {
                           billData.payments[participantId] && 
                           !isConfirmed;
           
-          // Check if payment was requested
           const isRequested = billData.payments && 
                             billData.payments[`request_${participantId}`] &&
                             billData.payments[`request_${participantId}`].status === 'requested';
@@ -146,12 +137,10 @@ const BillDetailsScreen = ({ route, navigation }) => {
   const handlePaymentAction = (payment) => {
     const currentUserId = auth.currentUser.uid;
     
-    // If current user is the payer (regardless of request status)
     if (currentUserId === payment.userId) {
       if (payment.status === 'confirmed') {
         Alert.alert("Payment Confirmed", "This payment has been completed and confirmed.");
       } else {
-        // Allow direct payment without requiring request
         navigation.navigate('ConfirmPayment', {
           billId: billId,
           payerId: payment.userId,
@@ -160,14 +149,12 @@ const BillDetailsScreen = ({ route, navigation }) => {
         });
       }
     }
-    // If current user is the bill owner
     else if (currentUserId === payment.ownerId) {
       if (payment.status === 'confirmed') {
         Alert.alert("Payment Confirmed", "This payment has been completed and confirmed.");
       } else if (payment.status === 'pending') {
         Alert.alert("Payment Pending", `${payment.name} has claimed to have paid. Please check your account.`);
       } else {
-        // Owner wants to request payment
         navigation.navigate('RequestPayment', {
           billId: billId,
           payerId: payment.userId,
@@ -176,14 +163,12 @@ const BillDetailsScreen = ({ route, navigation }) => {
         });
       }
     }
-    // If current user is neither owner nor payer
     else {
       Alert.alert("Payment Status", `This payment is currently ${payment.status}.`);
     }
   };
   
   const handleEditBill = () => {
-    // Only allow bill owner to edit
     if (!isCurrentUserOwner) {
       Alert.alert("Not Authorized", "Only the bill owner can edit this bill.");
       return;

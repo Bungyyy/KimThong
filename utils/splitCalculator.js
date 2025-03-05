@@ -1,17 +1,14 @@
-// Calculate equal split for each participant
 export const calculateEqualSplit = (totalAmount, participants) => {
     if (!participants || participants.length === 0) return {};
     
     const splitAmount = totalAmount / participants.length;
-    const roundedAmount = Math.round(splitAmount * 100) / 100; // Round to 2 decimal places
+    const roundedAmount = Math.round(splitAmount * 100) / 100;
     
     const result = {};
     let allocatedTotal = 0;
-    
-    // Assign the rounded amount to each participant
+
     participants.forEach((participant, index) => {
       if (index === participants.length - 1) {
-        // For the last participant, adjust to make sure the total is exact
         result[participant] = Math.round((totalAmount - allocatedTotal) * 100) / 100;
       } else {
         result[participant] = roundedAmount;
@@ -22,13 +19,10 @@ export const calculateEqualSplit = (totalAmount, participants) => {
     return result;
   };
   
-  // Calculate custom split based on specified amounts
   export const calculateCustomSplit = (totalAmount, customAmounts) => {
     if (!customAmounts || Object.keys(customAmounts).length === 0) return {};
     
     const customTotal = Object.values(customAmounts).reduce((sum, amount) => sum + amount, 0);
-    
-    // If there's a discrepancy, adjust the last amount
     if (Math.abs(customTotal - totalAmount) > 0.01) {
       const participants = Object.keys(customAmounts);
       const lastParticipant = participants[participants.length - 1];
@@ -42,7 +36,6 @@ export const calculateEqualSplit = (totalAmount, participants) => {
     return customAmounts;
   };
   
-  // Calculate how much each person owes to the bill payer
   export const calculateDebts = (totalAmount, splits, payerId) => {
     const debts = [];
     

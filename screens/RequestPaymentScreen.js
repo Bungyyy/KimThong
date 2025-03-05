@@ -31,7 +31,6 @@ const RequestPaymentScreen = ({ route, navigation }) => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // Get bill details
       const billDoc = await getDoc(doc(db, "bills", billId));
       if (billDoc.exists()) {
         setBill(billDoc.data());
@@ -40,8 +39,7 @@ const RequestPaymentScreen = ({ route, navigation }) => {
         navigation.goBack();
         return;
       }
-      
-      // Get owner details
+
       const ownerDoc = await getDoc(doc(db, "users", ownerId));
       if (ownerDoc.exists()) {
         setOwner(ownerDoc.data());
@@ -50,8 +48,7 @@ const RequestPaymentScreen = ({ route, navigation }) => {
         navigation.goBack();
         return;
       }
-      
-      // Get payer details
+
       const payerDoc = await getDoc(doc(db, "users", payerId));
       if (payerDoc.exists()) {
         setPayer(payerDoc.data());
@@ -126,8 +123,7 @@ const RequestPaymentScreen = ({ route, navigation }) => {
       </View>
     );
   }
-  
-  // Check if owner has QR payment details
+
   const hasQrPayment = owner && owner.qrPayment && 
                       owner.qrPayment.accountNumber && 
                       owner.qrPayment.bankName;

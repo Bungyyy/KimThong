@@ -35,7 +35,6 @@ const CreateGroupScreen = ({ navigation }) => {
       
       usersSnapshot.forEach(doc => {
         const userData = doc.data();
-        // Don't include current user in the list
         if (doc.id !== auth.currentUser.uid) {
           usersData.push({
             id: doc.id,
@@ -55,7 +54,6 @@ const CreateGroupScreen = ({ navigation }) => {
   };
 
   const handleAddUser = (user) => {
-    // Check if user is already selected
     if (selectedUsers.some(u => u.id === user.id)) {
       Alert.alert("Error", "This user is already added to the group");
       return;
@@ -78,10 +76,8 @@ const CreateGroupScreen = ({ navigation }) => {
 
     setIsCreating(true);
     try {
-      // Add current user to group members
       const memberIds = selectedUsers.map(user => user.id);
-      
-      // Create the group
+
       const result = await createGroup(groupName, auth.currentUser.uid);
       
       if (result.success) {
@@ -127,8 +123,7 @@ const CreateGroupScreen = ({ navigation }) => {
               <Text style={styles.addUserText}>Add</Text>
             </TouchableOpacity>
           </View>
-          
-          {/* Current user (you) */}
+
           <View style={styles.participantsContainer}>
             <View style={styles.participantItem}>
               <View style={styles.participantInfo}>
@@ -137,8 +132,7 @@ const CreateGroupScreen = ({ navigation }) => {
               </View>
               <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
             </View>
-            
-            {/* Selected users */}
+
             {selectedUsers.map(user => (
               <View key={user.id} style={styles.participantItem}>
                 <View style={styles.participantInfo}>

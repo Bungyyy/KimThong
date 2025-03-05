@@ -9,7 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './services/firebaseConfig';
 
-// Screens
 import LoginScreen from './screens/LoginScreen.js';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -82,7 +81,7 @@ export default function App() {
   }, []);
 
   if (isLoading) {
-    return null; // or a loading screen
+    return null;
   }
 
   return (
@@ -103,7 +102,6 @@ export default function App() {
           }}
         >
           {!isLoggedIn ? (
-            // Auth screens
             <>
               <Stack.Screen 
                 name="Login" 
@@ -117,7 +115,6 @@ export default function App() {
               />
             </>
           ) : (
-            // App screens
             <>
               <Stack.Screen 
                 name="MainTabs" 

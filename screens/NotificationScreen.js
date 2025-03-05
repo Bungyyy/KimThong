@@ -24,7 +24,7 @@ const NotificationScreen = ({ navigation }) => {
   const [weeklyReminder, setWeeklyReminder] = useState(false);
 
   useEffect(() => {
-    // Load saved notification settings
+
     const loadSettings = async () => {
       try {
         const timeStr = await AsyncStorage.getItem('notificationTime');
@@ -98,7 +98,7 @@ const NotificationScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.settingsContainer}>
-          {/* Notification Time */}
+
           <TouchableOpacity
             style={styles.settingItem}
             onPress={() => setShowTimePicker(true)}
@@ -121,8 +121,7 @@ const NotificationScreen = ({ navigation }) => {
             </View>
             <Ionicons name="calendar" size={24} color="#2B478B" />
           </TouchableOpacity>
-          
-          {/* Daily Reminder */}
+
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
               <Text style={styles.settingTitle}>Daily Reminder</Text>
@@ -137,8 +136,7 @@ const NotificationScreen = ({ navigation }) => {
               thumbColor="#fff"
             />
           </View>
-          
-          {/* Weekly Reminder */}
+
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
               <Text style={styles.settingTitle}>Weekly Reminder</Text>
@@ -171,7 +169,6 @@ const NotificationScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Time Picker Modal for iOS */}
       {Platform.OS === 'ios' && showTimePicker && (
         <Modal
           transparent={true}
@@ -201,7 +198,6 @@ const NotificationScreen = ({ navigation }) => {
         </Modal>
       )}
 
-      {/* Date Picker Modal for iOS */}
       {Platform.OS === 'ios' && showDatePicker && (
         <Modal
           transparent={true}
@@ -231,7 +227,6 @@ const NotificationScreen = ({ navigation }) => {
         </Modal>
       )}
 
-      {/* Android Pickers */}
       {Platform.OS === 'android' && showTimePicker && (
         <DateTimePicker
           value={notificationTime}

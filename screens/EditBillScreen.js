@@ -22,8 +22,6 @@ import { formatDate } from '../utils/dateFormatter';
 
 const EditBillScreen = ({ route, navigation }) => {
   const { billId, bill: initialBill } = route.params;
-  
-  // Form state
   const [restaurant, setRestaurant] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
   const [dueDate, setDueDate] = useState(new Date());
@@ -31,8 +29,6 @@ const EditBillScreen = ({ route, navigation }) => {
   const [participants, setParticipants] = useState([]);
   const [customAmounts, setCustomAmounts] = useState({});
   const [menuItems, setMenuItems] = useState([]);
-  
-  // UI state
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [currentMenuItem, setCurrentMenuItem] = useState({
@@ -45,10 +41,8 @@ const EditBillScreen = ({ route, navigation }) => {
   
   useEffect(() => {
     if (initialBill) {
-      // Pre-populate with passed bill data
       initializeFormWithBill(initialBill);
     } else {
-      // Fetch bill data if not provided
       fetchBillDetails();
     }
   }, []);
@@ -59,13 +53,11 @@ const EditBillScreen = ({ route, navigation }) => {
     setDueDate(billData.dueDate?.toDate() || new Date());
     setParticipants(billData.participants?.map(id => ({
       id,
-      name: '',  // Will be filled in fetchParticipantDetails
+      name: '',
       email: ''
     })) || []);
     setCustomAmounts(billData.splitAmounts || {});
     setMenuItems(billData.menuItems || []);
-    
-    // Fetch participant details
     fetchParticipantDetails(billData.participants || []);
   };
   
@@ -126,30 +118,23 @@ const EditBillScreen = ({ route, navigation }) => {
       setDueDate(selectedDate);
     }
   };
-  
-  // Update total amount when menu items change
+
   useEffect(() => {
     if (menuItems.length > 0) {
       const total = menuItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
       setTotalAmount(total.toString());
-      
-      // Recalculate custom splits based on menu items
+
       if (participants.length > 0) {
         calculateMenuBasedSplits();
       }
     }
   }, [menuItems]);
-  
-  // Calculate per-person split based on menu items
+
   const calculateMenuBasedSplits = () => {
     const newSplits = {};
-    
-    // Initialize all participants with 0
     participants.forEach(user => {
       newSplits[user.id] = 0;
     });
-    
-    // Calculate each person's share based on menu items
     menuItems.forEach(item => {
       const itemPrice = parseFloat(item.price) || 0;
       const consumerCount = item.consumers.length;
@@ -162,16 +147,14 @@ const EditBillScreen = ({ route, navigation }) => {
         });
       }
     });
-    
-    // Round to 2 decimal places
+
     Object.keys(newSplits).forEach(userId => {
       newSplits[userId] = Math.round(newSplits[userId] * 100) / 100;
     });
     
     setCustomAmounts(newSplits);
   };
-  
-  // Handle menu item functions
+
   const handleAddMenuItem = () => {
     if (!currentMenuItem.name || !currentMenuItem.price) {
       Alert.alert("Error", "Please enter both item name and price");
@@ -184,16 +167,13 @@ const EditBillScreen = ({ route, navigation }) => {
     }
     
     if (itemIndex !== null) {
-      // Edit existing item
       const updatedItems = [...menuItems];
       updatedItems[itemIndex] = currentMenuItem;
       setMenuItems(updatedItems);
     } else {
-      // Add new item
       setMenuItems([...menuItems, currentMenuItem]);
     }
-    
-    // Reset the current menu item and close modal
+
     setCurrentMenuItem({ name: '', price: '', consumers: [] });
     setItemIndex(null);
     setMenuItemModalVisible(false);
@@ -335,8 +315,7 @@ const EditBillScreen = ({ route, navigation }) => {
               placeholder="Enter restaurant name"
             />
           </View>
-          
-          {/* Menu Items Section */}
+
           <View style={styles.inputContainer}>
             <View style={styles.labelRow}>
               <Text style={styles.inputLabel}>Menu Items</Text>
@@ -367,8 +346,7 @@ const EditBillScreen = ({ route, navigation }) => {
               </View>
             )}
           </View>
-          
-          {/* Total Amount (calculated automatically from menu items) */}
+
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Total Amount (THB)</Text>
             <TextInput
@@ -386,7 +364,6 @@ const EditBillScreen = ({ route, navigation }) => {
             )}
           </View>
           
-          {/* Due Date */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Due Date</Text>
             <TouchableOpacity
@@ -407,8 +384,7 @@ const EditBillScreen = ({ route, navigation }) => {
               />
             )}
           </View>
-          
-          {/* Bill Splits Summary */}
+
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Bill Split Summary</Text>
             <View style={styles.splitSummaryContainer}>
@@ -436,8 +412,7 @@ const EditBillScreen = ({ route, navigation }) => {
               </View>
             </View>
           </View>
-          
-          {/* Save Button */}
+
           <TouchableOpacity
             style={[styles.saveButton, isSaving && styles.disabledButton]}
             onPress={handleSaveChanges}
@@ -457,8 +432,7 @@ const EditBillScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      
-      {/* Menu Item Modal */}
+
       <Modal
         visible={menuItemModalVisible}
         transparent={true}
