@@ -256,7 +256,8 @@ const AddBillFormScreen = ({ navigation, route }) => {
       
       if (result.success) {
         Alert.alert("Success", "Bill added successfully");
-        navigation.navigate('Home');
+        navigation.goBack();
+        navigation.goBack();
       } else {
         Alert.alert("Error", result.error);
       }

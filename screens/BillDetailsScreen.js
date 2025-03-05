@@ -91,7 +91,7 @@ const BillDetailsScreen = ({ route, navigation }) => {
       setUserMap(usersData);
       setParticipants(participantsList);
       
-      // Process payment status
+      // Process payment status - using the same currentUserId from above
       const paymentsList = [];
       
       // For each participant
